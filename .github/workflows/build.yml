@@ -1,0 +1,32 @@
+name: Build ThreatCheck
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  workflow_dispatch: # Allows you to run this manually from the Actions tab
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet Packages
+      run: nuget restore ThreatCheck.sln
+
+    - name: Build Solution
+      run: msbuild ThreatCheck.sln /p:Configuration=Release /p:Platform="Any CPU"
+
+    - name: Upload Executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: ThreatCheck-Binary
+        path: ThreatCheck/bin/Release/ThreatCheck.exe
